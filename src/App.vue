@@ -1,51 +1,66 @@
 <template>
-  <div>
-    <header class="site-header jumbotron">
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-12">
-            <h1>请发表对React的评论</h1>
-          </div>
-        </div>
-      </div>
-    </header>
-    <div class="container">
-        <Add @addComment='addComment'/>
-        <List :comments='comments' :deleteComment='deleteComment'/>
+  <div class="todo-container">
+    <div class="todo-wrap">
+      <!-- <Header :addTodo='addTodo'></Header> -->
+      <Header @addTodo="addTodo"></Header>
+      <Main :todos="todos" :deleteTodo="deleteTodo" :updataOne="updataOne"></Main>
+      <Footer :todos="todos" :updetaAll="updetaAll" :deleteAll="deleteAll"></Footer>
     </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-import Add from '@/components/Add'
-import List from '@/components/List'
+import Header from "./components/Header";
+import Main from "./components/Main";
+import Footer from "./components/Footer";
 export default {
-    components:{
-        Add,
-        List
+  components: {
+    Header,
+    Main,
+    Footer
+  },
+  data() {
+    return {
+      todos: JSON.parse(localStorage.getItem("todos_key")) || []
+    };
+  },
+  methods: {
+    addTodo(obj) {
+      this.todos.unshift(obj);
     },
-    data(){
-        return {
-            comments:[
-                {id:1,username:"欧阳娜娜",content:'hello'},
-                {id:2,username:"王源",content:'hello'},
-                {id:3,username:"王俊凯",content:'hello'},
-            ]
-        }
+    deleteTodo(index) {
+      this.todos.splice(index, 1);
     },
-    // mounted() {
-    //     this.$refs.add.$on('addComment',this.addComment)
-    // },
-    methods:{
-        addComment(obj){
-            this.comments.unshift(obj)
-        },
-        deleteComment(index){
-            this.comments.splice(index,1)
-        }
+    updataOne(index, val) {
+      this.todos[index].isOver = val;
+    },
+    updetaAll(val) {
+      this.todos.forEach(item => (item.isOver = val));
+    },
+    deleteAll() {
+      this.todos = this.todos.filter(item => !item.isOver);
     }
+  },
+  watch: {
+    todos: {
+      deep: true,
+      handler(newVal, oldVal) {
+        localStorage.setItem("todos_key", JSON.stringify(newVal));
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
+/*app*/
+.todo-container {
+  width: 600px;
+  margin: 0 auto;
+}
+.todo-container .todo-wrap {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
 </style>
